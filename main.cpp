@@ -1,6 +1,7 @@
 #include "mbed.h"
-#include <iomanip>
 #include "math.h"
+#include <iomanip>
+#include <cmath>
 #include "mbed_rpc.h"
 #include "uLCD_4DGL.h"
 #include "MQTTNetwork.h"
@@ -24,24 +25,30 @@ void gestureUI(Arguments *in, Reply *out);
 void tilt(Arguments *in, Reply *out);
 RPCFunction rpcgesture(&gestureUI, "gestureUI");
 RPCFunction rpctilt(&tilt, "tilt");
+// RPCFunction rpcadd(&add, "add");     // 
 BufferedSerial pc(USBTX, USBRX);
-Thread thread, t;
+Thread thread, t;       
 EventQueue queue(64 * EVENTS_EVENT_SIZE);
 InterruptIn sw0(USER_BUTTON);
 WiFiInterface *wifi;
 
 int16_t PDataXYZ[3] = {0};
 int16_t rDataXYZ[3] = {0};
+int16_t gDataXYZ[3] = {0};  //
 uLCD_4DGL uLCD(D1, D0, D2);
 DigitalOut myled(LED1);
 DigitalOut myled2(LED2);
 DigitalOut myled3(LED3);
+int cnt = 0;                //
 int Count = 0;
 int ThresholdCount = 10;
+int gesturecount = 10;      //
 int off = 1;
 int off2 = 1;
+int off3 = 1;               // 
 double val = 0;
 int idR[32] = {0};
+int idR2[32] = {0};         // 
 int indexR = 0;
 //int gesture_index;
 int c = 0, angle = 0;
@@ -56,11 +63,6 @@ const char* topic = "Mbed";
 
 Thread mqtt_thread(osPriorityHigh);
 EventQueue mqtt_queue;
-// I2C Communication
-// I2C i2c_lcd(D14,D15); // SDA, SCL
-
-// TextLCD_I2C lcd(&i2c_lcd, 0x4E, TextLCD::LCD16x2);  // I2C bus, PCF8574 Slaveaddress, LCD Type
-
 
 void led() {
     while (off2) {
@@ -278,6 +280,10 @@ void messageArrived(MQTT::MessageData& md) {
         Count = 0;
         off = 0;
     }
+    if (cnt > gesturecount) {
+        cnt = 0;
+        off3 = 0;
+    }
 }
 
 void close_mqtt() {
@@ -378,8 +384,29 @@ void record(void) {
     uLCD.printf("angle = %g  %d, %d, %d\n", val, PDataXYZ[0], PDataXYZ[1], PDataXYZ[2]);
     if (val > angle) {
         printf("angle = %g  %d, %d, %d\n", val, PDataXYZ[0], PDataXYZ[1], PDataXYZ[2]);
-        mqtt_queue.call(&publish_message, rpcclient);
+        printf("Change of direction!\n");
         Count = Count + 1;
+        mqtt_queue.call(&publish_message, rpcclient);
+    }
+}
+
+void station(void) {
+    //double val;
+    BSP_ACCELERO_AccGetXYZ(gDataXYZ);
+    val = gDataXYZ[0]*rDataXYZ[0] + gDataXYZ[1]*rDataXYZ[1] + gDataXYZ[2]*rDataXYZ[2];
+    val = val / sqrt(gDataXYZ[0]*gDataXYZ[0] + gDataXYZ[1]*gDataXYZ[1] + gDataXYZ[2]*gDataXYZ[2]);
+    val = val / sqrt(rDataXYZ[0]*rDataXYZ[0] + rDataXYZ[1]*rDataXYZ[1] + rDataXYZ[2]*rDataXYZ[2]);
+    val = acos(val);
+    val = val/ M_PI * 180;
+    // uLCD.cls();
+    // uLCD.printf("angle = %g  %d, %d, %d\n", val, gDataXYZ[0], gDataXYZ[1], gDataXYZ[2]);
+    if (val > angle) {
+        // printf("angle = %g  %d, %d, %d\n", val, gDataXYZ[0], gDataXYZ[1], gDataXYZ[2]);
+        printf("Change of direction!\n");
+        cnt = cnt + 1;
+        mqtt_queue.call(&publish_message, rpcclient);
+    } else {
+        printf("Stationary.\n");
     }
 }
 
@@ -394,6 +421,7 @@ void tilt(Arguments *in, Reply *out) {
     printf("Tilt mode");
     myled2 = 1;
     myled3 = 0;
+    off3 = 1;               //
     off = 1;
     c = 0;
     sw0.rise(&Confirm_angle);
@@ -404,11 +432,17 @@ void tilt(Arguments *in, Reply *out) {
         ThisThread::sleep_for(100ms);
     }
     myled3 = 0;
-    while (off) {
+    while (off && off3) {
         idR[indexR++] = mqtt_queue.call(record);
+        idR2[indexR++] = mqtt_queue.call(station);
         indexR = indexR % 32;
         ThisThread::sleep_for(100ms);
     }
+    // while (off3) {
+    //     idR2[indexR++] = mqtt_queue.call(station);
+    //     indexR = indexR % 32;
+    //     ThisThread::sleep_for(100ms);
+    // }
 }
 
 void gestureUI(Arguments *in, Reply *out) {
@@ -418,16 +452,12 @@ void gestureUI(Arguments *in, Reply *out) {
    printf("GESTURE MODE");
    c = 0;
    mqtt_queue.call(angle_select);
-   //for(int i = 0; tmp[i] != 0; i++) {
-     // lcd.putc(tmp[i]);
-   //}
 }
 
 int main() {
     //The mbed RPC classes are now wrapped to create an RPC enabled version - see RpcClasses.h so don't add to base class
     // receive commands, and send back the responses
     
-    // lcd.setCursor(TextLCD::CurOff_BlkOn);
     BSP_ACCELERO_Init();
     char buf[256], outbuf[256];
 
@@ -450,6 +480,10 @@ int main() {
         printf("%s\r\n", outbuf);
     }
 }
+
+// void add(Arguments *in, Reply *out) {
+
+// }
 
 /*void doLocate(Arguments *in, Reply *out) {
    int x = in->getArg<int>();

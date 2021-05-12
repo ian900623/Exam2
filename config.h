@@ -29,7 +29,7 @@ struct Config {
         "    *            \n\r"
         "   *             \n\r"
         "  *              \n\r"
-        " * * * * * * * * \n\r"
+        " * * * * * * * * \n\r",
         "upside_u:\n\r"
         "          *       \n\r"
         "       *     *    \n\r"

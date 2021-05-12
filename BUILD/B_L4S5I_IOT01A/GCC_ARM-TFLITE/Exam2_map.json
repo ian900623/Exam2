@@ -5,31 +5,31 @@
             ".text": 64918,
             ".data": 543,
             ".bss": 14045,
-            ".text-delta": 64918,
-            ".data-delta": 543,
-            ".bss-delta": 14045
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
         }
     },
     {
         "module": "BUILD/B_L4S5I_IOT01A",
         "size": {
-            ".text": 32734,
-            ".data": 321,
-            ".bss": 67035,
-            ".text-delta": 32734,
-            ".data-delta": 321,
-            ".bss-delta": 67035
+            ".text": 33120,
+            ".data": 329,
+            ".bss": 67173,
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
         }
     },
     {
         "module": "[fill]",
         "size": {
-            ".text": 280,
+            ".text": 278,
             ".data": 17,
-            ".bss": 51,
-            ".text-delta": 280,
-            ".data-delta": 17,
-            ".bss-delta": 51
+            ".bss": 49,
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
         }
     },
     {
@@ -38,9 +38,9 @@
             ".text": 48916,
             ".data": 2474,
             ".bss": 89,
-            ".text-delta": 48916,
-            ".data-delta": 2474,
-            ".bss-delta": 89
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
         }
     },
     {
@@ -49,7 +49,7 @@
             ".text": 3596,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": 3596,
+            ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -60,8 +60,8 @@
             ".text": 4504,
             ".data": 1,
             ".bss": 0,
-            ".text-delta": 4504,
-            ".data-delta": 1,
+            ".text-delta": 0,
+            ".data-delta": 0,
             ".bss-delta": 0
         }
     },
@@ -71,9 +71,9 @@
             ".text": 180,
             ".data": 4,
             ".bss": 28,
-            ".text-delta": 180,
-            ".data-delta": 4,
-            ".bss-delta": 28
+            ".text-delta": 0,
+            ".data-delta": 0,
+            ".bss-delta": 0
         }
     },
     {
@@ -82,7 +82,7 @@
             ".text": 32,
             ".data": 0,
             ".bss": 0,
-            ".text-delta": 32,
+            ".text-delta": 0,
             ".data-delta": 0,
             ".bss-delta": 0
         }
@@ -93,17 +93,17 @@
             ".text": 40,
             ".data": 0,
             ".bss": 16,
-            ".text-delta": 40,
+            ".text-delta": 0,
             ".data-delta": 0,
-            ".bss-delta": 16
+            ".bss-delta": 0
         }
     },
     {
         "summary": {
-            "static_ram": 84624,
-            "static_ram_delta": 84624,
-            "total_flash": 158560,
-            "total_flash_delta": 158560
+            "static_ram": 84768,
+            "static_ram_delta": 0,
+            "total_flash": 158952,
+            "total_flash_delta": 0
         }
     }
 ]
